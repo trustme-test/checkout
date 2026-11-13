@@ -47,6 +47,34 @@ const PRODUCTS: readonly Product[] = [
     unitPrice: 1850,
     emoji: "☕",
   },
+  {
+    id: "coca-cola-330ml",
+    name: "Coca-Cola, 330 ml",
+    description: "Classic cola in a chilled can.",
+    unitPrice: 250,
+    emoji: "🥤",
+  },
+  {
+    id: "fanta-330ml",
+    name: "Fanta Orange, 330 ml",
+    description: "Bright, fizzy orange soda in a can.",
+    unitPrice: 250,
+    emoji: "🍊",
+  },
+  {
+    id: "root-beer-355ml",
+    name: "Root Beer, 355 ml",
+    description: "Creamy, sweet root beer with vanilla and wintergreen.",
+    unitPrice: 290,
+    emoji: "🍺",
+  },
+  {
+    id: "beer-330ml",
+    name: "Beer, 330 ml",
+    description: "Crisp lager in a bottle.",
+    unitPrice: 350,
+    emoji: "🍻",
+  },
 ];
 
 const PRODUCTS_BY_ID = new Map(PRODUCTS.map((product) => [product.id, product]));

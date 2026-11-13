@@ -5,7 +5,7 @@ Customers browse the range, add products to a basket and pay by card.
 
 The store currently runs in **test mode**: the catalog is fixed, payments are simulated, and no
 order data is stored. There is no database, so the app runs anywhere Node.js does, with no
-configuration. In production, API calls can be audit-logged to Datadog (optional, see
+configuration. API calls can be audit-logged to Datadog (optional, see
 [docs/deployment.md](docs/deployment.md#audit-logs-in-datadog)).
 
 ## Features

@@ -17,7 +17,9 @@ The app is **stateless** and runs in **test mode**:
 - The basket lives in the browser's `localStorage`. The server never stores it.
 - Payments are simulated in `src/server/payments.ts`. No payment provider is called, no money
   moves, and orders are not persisted.
-- No environment variables, secrets or external services are needed to run, test or build.
+- API calls are audit-logged to Datadog by `src/server/audit-log.ts` when `DD_API_KEY` is set.
+  Without it, logging is off. No environment variables, secrets or external services are needed
+  to run, test or build.
 
 Read `docs/architecture.md` for the design and `docs/api.md` for the HTTP API contract.
 
@@ -72,7 +74,7 @@ src/
     money.ts            Money formatting
     api-client.ts       Typed fetch client for Client Components
     basket/             localStorage basket store and useBasket hook
-  server/               Server-only domain logic: catalog, pricing, orders, payments, HTTP helpers
+  server/               Server-only logic: catalog, pricing, orders, payments, HTTP, audit log
   test/                 Test fixtures and helpers
 docs/                   Architecture, API and deployment docs
 .github/workflows/      CI and production deployment
@@ -91,9 +93,10 @@ explain why in your PR description.
    rejects the order with `409 price_changed` if the total differs from what the customer confirmed.
 3. **Money is integer minor units (cents).** Never use floats for amounts. Format for display only
    with `formatMoney` from `src/lib/money.ts`.
-4. **Card data never leaves the request.** Never log, persist, return or put in error messages a
-   card number or CVC. Only `brand` and `last4` may be returned. Validation errors list field paths
-   and messages, never submitted values.
+4. **Card data never leaves the request.** Never log, persist, return, send to an external
+   service or put in error messages a card number or CVC. Only `brand` and `last4` may be returned.
+   Validation errors list field paths and messages, never submitted values. Audit logs never
+   include request or response bodies.
 5. **Stay stateless.** No database, file writes, in-memory caches of user data, or module-level
    mutable state on the server. Every request must work on a fresh serverless instance.
 6. **Validate every request body** with a Zod schema from `src/lib/schemas.ts` via `parseJsonBody`
@@ -101,8 +104,19 @@ explain why in your PR description.
    envelope: `{ "error": { "code", "message", "details?" } }`.
 7. **Keep route handlers thin.** Parse input, call a function in `src/server`, map the result to a
    response. Domain logic lives in `src/server` and returns `Result` values instead of throwing.
-8. **No external network calls**, analytics, tracking scripts or third-party SDKs. Don't load
-   fonts or assets from external hosts; builds must work offline.
+   Wrap per-request handlers in `withAuditLog` from `src/server/audit-log.ts`.
+8. **External calls only from the server, and only to listed services.** Code in `src/server` may
+   call the external services listed under "External services" in `docs/architecture.md`. Each
+   integration must:
+   - be optional: turned off when its environment variables are not set, so tests and builds
+     work offline with no configuration;
+   - run off the request path (for example in `after()`), with a timeout, so a slow or failing
+     service never delays or breaks a response;
+   - send no card data or other personal data.
+
+   No browser-side network calls except to our own API: no analytics, tracking scripts or
+   third-party SDKs in the browser, and no fonts or assets from external hosts.
+
 9. **Server Components by default.** Add `"use client"` only to components that need state, effects,
    event handlers or browser APIs.
 
@@ -146,6 +160,8 @@ Tests use Vitest and live next to the code they test (`card.ts` → `card.test.t
 - Component tests that call the API use `createRouteHandlerFetch()` from
   `src/test/route-handler-fetch.ts`. It sends `fetch` calls to the real route handlers in-process,
   so frontend and backend are tested together. Stub `fetch` only to simulate network failures.
+- Code that calls an external service is tested with `fetch` stubbed and `after` from
+  `next/server` mocked to collect its callbacks. See `src/server/audit-log.test.ts`.
 - Query by role and label (`getByRole`, `getByLabelText`) and interact through `userEvent`.
 - Code that depends on the current time takes a `now` parameter. Pass a fixed date in tests, or use
   `futureExpiry()` from `src/test/fixtures.ts` for card expiry dates.
@@ -183,12 +199,14 @@ Ask before (or explain in the PR why you need to):
 
 - Adding, removing or upgrading a dependency. Prefer the platform and existing dependencies.
 - Changing the API contract (request or response shapes, status codes, error codes).
+- Adding an external service or a new environment variable. List it in `docs/architecture.md`
+  and `docs/deployment.md`.
 - Changing `.github/workflows/`, `vercel.json`, `next.config.ts` or `eslint.config.mjs`.
 
 Never:
 
-- Add a real payment provider, database, analytics or any other external integration.
-- Commit secrets, tokens or `.env` files. The app needs none.
+- Add a real payment provider, database or browser-side analytics.
+- Commit secrets, tokens or `.env` files. Secrets live in Vercel's environment variables only.
 - Weaken lint rules, TypeScript settings or tests to make checks pass. Fix the code instead.
 - Edit `package-lock.json` by hand. Use `npm install`.
 - Edit generated files: `.next/`, `next-env.d.ts`.

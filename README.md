@@ -4,8 +4,9 @@ The storefront and checkout for **Fika Supply Co.**, a small shop for coffee and
 Customers browse the range, add products to a basket and pay by card.
 
 The store currently runs in **test mode**: the catalog is fixed, payments are simulated, and no
-order data is stored. There is no database and no third-party service, so the app runs anywhere
-Node.js does, with no configuration.
+order data is stored. There is no database, so the app runs anywhere Node.js does, with no
+configuration. In production, API calls can be audit-logged to Datadog (optional, see
+[docs/deployment.md](docs/deployment.md#audit-logs-in-datadog)).
 
 ## Features
 
@@ -15,6 +16,7 @@ Node.js does, with no configuration.
 - Card form with instant validation (card number checksum, expiry date, security code)
 - Simulated payment with approved and declined test cards
 - Order confirmation with an order number
+- Optional audit logs of API calls in Datadog
 
 ## Tech stack
 
@@ -27,6 +29,7 @@ Node.js does, with no configuration.
 | Testing   | Vitest, Testing Library, jsdom                                  |
 | Quality   | ESLint, Prettier                                                |
 | Hosting   | Vercel, deployed from GitHub Actions on every push to `main`    |
+| Logging   | Datadog HTTP log intake (optional)                              |
 
 ## Getting started
 
@@ -98,7 +101,7 @@ src/
   app/          Pages and API routes
   components/   React components
   lib/          Code shared by browser and server (types, schemas, validation, API client, basket)
-  server/       Server-only logic (catalog, pricing, orders, payments)
+  server/       Server-only logic (catalog, pricing, orders, payments, audit log)
   test/         Test fixtures and helpers
 docs/           Architecture, API and deployment docs
 ```

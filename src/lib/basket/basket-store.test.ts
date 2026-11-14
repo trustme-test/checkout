@@ -104,3 +104,82 @@ describe("createBasketStore", () => {
     expect(store.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
   });
 });
+
+describe("basket persistence", () => {
+  it("loads a saved basket from storage on first read", () => {
+    const storage = memoryStorage({
+      [BASKET_STORAGE_KEY]: JSON.stringify([{ productId: "mug", quantity: 2 }]),
+    });
+    const store = createBasketStore(() => storage);
+    expect(store.getSnapshot()).toEqual([{ productId: "mug", quantity: 2 }]);
+  });
+
+  it("ignores stored data that is not valid JSON or fails validation", () => {
+    const invalidJson = createBasketStore(() => memoryStorage({ [BASKET_STORAGE_KEY]: "{oops" }));
+    expect(invalidJson.getSnapshot()).toEqual([]);
+
+    const invalidShape = createBasketStore(() =>
+      memoryStorage({ [BASKET_STORAGE_KEY]: JSON.stringify([{ productId: 42 }]) }),
+    );
+    expect(invalidShape.getSnapshot()).toEqual([]);
+  });
+
+  it("keeps the basket in memory when storage throws on write", () => {
+    const throwingStorage = {
+      getItem: () => null,
+      setItem: () => {
+        throw new Error("QuotaExceededError");
+      },
+      removeItem: () => {
+        throw new Error("SecurityError");
+      },
+    };
+    const store = createBasketStore(() => throwingStorage);
+
+    store.add("mug");
+    expect(store.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
+
+    store.clear();
+    expect(store.getSnapshot()).toEqual([]);
+  });
+
+  it("clears the stored entry when the basket is emptied", () => {
+    const storage = memoryStorage();
+    const store = createBasketStore(() => storage);
+    store.add("mug");
+    expect(storage.data.has(BASKET_STORAGE_KEY)).toBe(true);
+
+    store.clear();
+    expect(storage.data.has(BASKET_STORAGE_KEY)).toBe(false);
+  });
+
+  it("re-reads the basket when another tab changes it", () => {
+    let onStorage: ((event: { key: string | null }) => void) | undefined;
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, handler: typeof onStorage) => {
+        if (type === "storage") onStorage = handler;
+      },
+      removeEventListener: vi.fn(),
+    });
+
+    try {
+      const storage = memoryStorage();
+      const store = createBasketStore(() => storage);
+      const listener = vi.fn();
+      const unsubscribe = store.subscribe(listener);
+
+      storage.data.set(BASKET_STORAGE_KEY, JSON.stringify([{ productId: "kettle", quantity: 1 }]));
+      onStorage?.({ key: BASKET_STORAGE_KEY });
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(store.getSnapshot()).toEqual([{ productId: "kettle", quantity: 1 }]);
+
+      onStorage?.({ key: "unrelated" });
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      unsubscribe();
+      expect(window.removeEventListener).toHaveBeenCalledWith("storage", onStorage);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});

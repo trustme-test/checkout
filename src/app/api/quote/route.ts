@@ -8,7 +8,7 @@ export const POST = withAuditLog(async (request) => {
   const body = await parseJsonBody(request, quoteRequestSchema);
   if (!body.ok) return body.response;
 
-  const result = createQuote(body.data.items);
+  const result = await createQuote(body.data.items);
   if (!result.ok) return errorResponse(result.error);
 
   return Response.json(result.quote);

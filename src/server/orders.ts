@@ -1,6 +1,7 @@
 import { validateCard } from "@/lib/card";
 import type { OrderRequest } from "@/lib/schemas";
 import type { OrderConfirmation } from "@/lib/types";
+import type { ProductRepository } from "./catalog";
 import { fail, type Result } from "./errors";
 import { authorizePayment } from "./payments";
 import { createQuote } from "./pricing";
@@ -8,6 +9,7 @@ import { createQuote } from "./pricing";
 export type PlaceOrderOptions = {
   now?: Date;
   createId?: () => string;
+  catalog?: ProductRepository;
 };
 
 /**
@@ -16,16 +18,16 @@ export type PlaceOrderOptions = {
  *
  * Orders are not persisted; the confirmation is returned to the caller only.
  */
-export function placeOrder(
+export async function placeOrder(
   request: OrderRequest,
-  { now = new Date(), createId = () => crypto.randomUUID() }: PlaceOrderOptions = {},
-): Result<{ order: OrderConfirmation }> {
+  { now = new Date(), createId = () => crypto.randomUUID(), catalog }: PlaceOrderOptions = {},
+): Promise<Result<{ order: OrderConfirmation }>> {
   const card = validateCard(request.card, now);
   if (!card.ok) {
     return fail("invalid_card", "Some card details are not valid.", { fields: card.errors });
   }
 
-  const priced = createQuote(request.items);
+  const priced = await createQuote(request.items, catalog);
   if (!priced.ok) return priced;
   const { quote } = priced;
 

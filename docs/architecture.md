@@ -72,7 +72,7 @@ Components as props, so the shop page needs no API call.
 
 ## Key decisions
 
-**Stateless by design.** There is no database. The catalog is code, the basket is client-side, and
+**Stateless by design.** There is no real database. The catalog is a read-only in-memory map behind `ProductRepository` (a Postgres implementation exists for integration tests), the basket is client-side, and
 orders are returned to the browser but not stored. Any serverless instance can serve any request.
 The only configuration is the optional Datadog API key for audit logs.
 

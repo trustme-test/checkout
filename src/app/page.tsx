@@ -2,8 +2,8 @@ import { BasketSummary } from "@/components/basket-summary";
 import { ProductCard } from "@/components/product-card";
 import { listProducts } from "@/server/catalog";
 
-export default function ShopPage() {
-  const products = listProducts();
+export default async function ShopPage() {
+  const products = await listProducts();
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">

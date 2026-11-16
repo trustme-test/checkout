@@ -8,8 +8,8 @@ const items = [{ productId: "ceramic-dripper", quantity: 1 }];
 const card = validCardInput({ expiry: "12/27" });
 
 describe("placeOrder", () => {
-  it("confirms the order and only exposes the last four card digits", () => {
-    const result = placeOrder({ items, card, expectedTotal: 2900 }, options);
+  it("confirms the order and only exposes the last four card digits", async () => {
+    const result = await placeOrder({ items, card, expectedTotal: 2900 }, options);
 
     expect(result).toEqual({
       ok: true,
@@ -28,8 +28,8 @@ describe("placeOrder", () => {
     expect(JSON.stringify(result)).not.toContain(card.cvc);
   });
 
-  it("returns field errors for invalid card details", () => {
-    const result = placeOrder(
+  it("returns field errors for invalid card details", async () => {
+    const result = await placeOrder(
       { items, card: { ...card, number: TEST_CARDS.invalidChecksum }, expectedTotal: 2900 },
       options,
     );
@@ -43,24 +43,24 @@ describe("placeOrder", () => {
     });
   });
 
-  it("refuses to charge when the confirmed total no longer matches", () => {
-    const result = placeOrder({ items, card, expectedTotal: 100 }, options);
+  it("refuses to charge when the confirmed total no longer matches", async () => {
+    const result = await placeOrder({ items, card, expectedTotal: 100 }, options);
     expect(result).toMatchObject({
       ok: false,
       error: { code: "price_changed", details: { quote: { total: 2900 } } },
     });
   });
 
-  it("passes on pricing errors", () => {
-    const result = placeOrder(
+  it("passes on pricing errors", async () => {
+    const result = await placeOrder(
       { items: [{ productId: "nope", quantity: 1 }], card, expectedTotal: 0 },
       options,
     );
     expect(result).toMatchObject({ ok: false, error: { code: "unknown_product" } });
   });
 
-  it("declines the declined test card", () => {
-    const result = placeOrder(
+  it("declines the declined test card", async () => {
+    const result = await placeOrder(
       { items, card: { ...card, number: TEST_CARDS.declined }, expectedTotal: 2900 },
       options,
     );

@@ -93,4 +93,11 @@ export const SEED_PRODUCTS: readonly Product[] = [
     unitPrice: 280,
     emoji: "🥛",
   },
+  {
+    id: "semla",
+    name: "semla",
+    description: "Cardamom bun filled with almond paste and whipped cream",
+    unitPrice: 3.2,
+    emoji: "🧁",
+  },
 ];

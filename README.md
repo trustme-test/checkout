@@ -1,7 +1,7 @@
 # Checkout
 
 The storefront and checkout for **Fika Supply Co.**, a small shop for coffee and brewing gear.
-Customers browse the range, add products to a basket and pay by card.
+Customers browse the range, add products to a basket and pay by card..
 
 The store currently runs in **test mode**: the catalog is served from a mocked in-memory database, payments are simulated, and no
 order data is stored. There is no real database, so the app runs anywhere Node.js does, with no

@@ -94,10 +94,10 @@ export const SEED_PRODUCTS: readonly Product[] = [
     emoji: "🥛",
   },
   {
-    id: "Kanelbulle",
-    name: "cinnamon bun",
+    id: "cinnamon-bun",
+    name: "Cinnamon Bun",
     description: "Soft Swedish bun swirled with cinnamon and pearl sugar",
-    unitPrice: 2.9,
+    unitPrice: 290,
     emoji: "🌀",
   },
 ];

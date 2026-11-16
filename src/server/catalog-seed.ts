@@ -93,4 +93,11 @@ export const SEED_PRODUCTS: readonly Product[] = [
     unitPrice: 280,
     emoji: "🥛",
   },
+  {
+    id: "cardamom-bun",
+    name: "Cardamom Bun",
+    description: "Swedish fika classic, freshly baked with crushed cardamom",
+    unitPrice: 350,
+    emoji: "🥐",
+  },
 ];

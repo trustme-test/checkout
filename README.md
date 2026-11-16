@@ -3,8 +3,8 @@
 The storefront and checkout for **Fika Supply Co.**, a small shop for coffee and brewing gear.
 Customers browse the range, add products to a basket and pay by card.
 
-The store currently runs in **test mode**: the catalog is fixed, payments are simulated, and no
-order data is stored. There is no database, so the app runs anywhere Node.js does, with no
+The store currently runs in **test mode**: the catalog is served from a mocked in-memory database, payments are simulated, and no
+order data is stored. There is no real database, so the app runs anywhere Node.js does, with no
 configuration. API calls can be audit-logged to Datadog (optional, see
 [docs/deployment.md](docs/deployment.md#audit-logs-in-datadog)).
 
@@ -45,16 +45,17 @@ Open http://localhost:3000, add a few products and go to checkout. Pay with one 
 
 ## Scripts
 
-| Command             | What it does                                         |
-| ------------------- | ---------------------------------------------------- |
-| `npm run dev`       | Start the dev server on port 3000                    |
-| `npm run build`     | Create a production build                            |
-| `npm start`         | Serve the production build                           |
-| `npm run check`     | Lint, check formatting, typecheck and run tests      |
-| `npm run lint`      | Run ESLint (`lint:fix` to fix what it can)           |
-| `npm run format`    | Format all files with Prettier                       |
-| `npm run typecheck` | Generate route types and run the TypeScript compiler |
-| `npm test`          | Run the test suite once (`test:watch` to watch)      |
+| Command                    | What it does                                         |
+| -------------------------- | ---------------------------------------------------- |
+| `npm run dev`              | Start the dev server on port 3000                    |
+| `npm run build`            | Create a production build                            |
+| `npm start`                | Serve the production build                           |
+| `npm run check`            | Lint, check formatting, typecheck and run tests      |
+| `npm run lint`             | Run ESLint (`lint:fix` to fix what it can)           |
+| `npm run format`           | Format all files with Prettier                       |
+| `npm run typecheck`        | Generate route types and run the TypeScript compiler |
+| `npm test`                 | Run the test suite once (`test:watch` to watch)      |
+| `npm run test:integration` | Run Postgres integration tests (needs Docker)        |
 
 ## Test cards
 

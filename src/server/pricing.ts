@@ -1,7 +1,7 @@
 import { CURRENCY } from "@/lib/money";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
 import type { BasketItem, Quote, QuoteLine } from "@/lib/types";
-import { getProduct } from "./catalog";
+import { defaultProductRepository, type ProductRepository } from "./catalog";
 import { fail, type Result } from "./errors";
 
 /**
@@ -10,7 +10,10 @@ import { fail, type Result } from "./errors";
  *
  * Duplicate product ids are merged, keeping the order they first appear in.
  */
-export function createQuote(items: readonly BasketItem[]): Result<{ quote: Quote }> {
+export async function createQuote(
+  items: readonly BasketItem[],
+  catalog: ProductRepository = defaultProductRepository,
+): Promise<Result<{ quote: Quote }>> {
   const quantities = new Map<string, number>();
   for (const item of items) {
     quantities.set(item.productId, (quantities.get(item.productId) ?? 0) + item.quantity);
@@ -18,7 +21,7 @@ export function createQuote(items: readonly BasketItem[]): Result<{ quote: Quote
 
   const lines: QuoteLine[] = [];
   for (const [productId, quantity] of quantities) {
-    const product = getProduct(productId);
+    const product = await catalog.get(productId);
     if (!product) {
       return fail("unknown_product", `Product "${productId}" is not available.`, { productId });
     }

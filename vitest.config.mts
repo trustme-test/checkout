@@ -15,6 +15,7 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["src/**/*.test.ts"],
+          exclude: ["src/**/*.integration.test.ts"],
         },
       },
       {

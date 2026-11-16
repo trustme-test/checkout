@@ -48,6 +48,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Integration test (Postgres in Docker)
+        run: npm run test:integration
+
       - name: Build
         run: npm run build
 

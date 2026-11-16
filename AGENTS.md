@@ -13,7 +13,10 @@ add them to a basket, and pay by card. It is one Next.js (App Router) app deploy
 
 The app is **stateless** and runs in **test mode**:
 
-- The product catalog is static data in `src/server/catalog.ts`. There is no database.
+- The product catalog sits behind the `ProductRepository` interface (`src/server/catalog.ts`). The
+  deployed app uses a mocked in-memory database (a read-only `Map` seeded from
+  `src/server/catalog-seed.ts`). `src/server/postgres-catalog.ts` is a Postgres implementation,
+  verified by `npm run test:integration` (Testcontainers, needs Docker) but not used in production.
 - The basket lives in the browser's `localStorage`. The server never stores it.
 - Payments are simulated in `src/server/payments.ts`. No payment provider is called, no money
   moves, and orders are not persisted.
@@ -37,6 +40,7 @@ Use npm (the lockfile is `package-lock.json`). Node.js 22 (`.nvmrc`).
 | Typecheck                                       | `npm run typecheck`                         |
 | Tests (single run / watch)                      | `npm test` / `npm run test:watch`           |
 | Run one test file                               | `npx vitest run src/server/pricing.test.ts` |
+| Integration tests (needs Docker)                | `npm run test:integration`                  |
 | Production build                                | `npm run build`                             |
 
 `npm run check` runs lint, format check, typecheck and tests. CI also runs `npm run build`, which

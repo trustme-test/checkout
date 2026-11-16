@@ -3,8 +3,8 @@ import { getProduct } from "./catalog";
 import { createQuote } from "./pricing";
 
 describe("createQuote", () => {
-  it("prices each line from the catalog and totals the basket", () => {
-    const result = createQuote([
+  it("prices each line from the catalog and totals the basket", async () => {
+    const result = await createQuote([
       { productId: "house-blend-500g", quantity: 2 },
       { productId: "paper-filters-100", quantity: 1 },
     ]);
@@ -35,8 +35,8 @@ describe("createQuote", () => {
     });
   });
 
-  it("merges duplicate products", () => {
-    const result = createQuote([
+  it("merges duplicate products", async () => {
+    const result = await createQuote([
       { productId: "stoneware-mug", quantity: 1 },
       { productId: "stoneware-mug", quantity: 2 },
     ]);
@@ -45,8 +45,8 @@ describe("createQuote", () => {
     ]);
   });
 
-  it("rejects unknown products", () => {
-    expect(createQuote([{ productId: "espresso-machine", quantity: 1 }])).toEqual({
+  it("rejects unknown products", async () => {
+    expect(await createQuote([{ productId: "espresso-machine", quantity: 1 }])).toEqual({
       ok: false,
       error: {
         code: "unknown_product",
@@ -56,15 +56,15 @@ describe("createQuote", () => {
     });
   });
 
-  it("rejects merged quantities above the per-item limit", () => {
-    const result = createQuote([
+  it("rejects merged quantities above the per-item limit", async () => {
+    const result = await createQuote([
       { productId: "stoneware-mug", quantity: 6 },
       { productId: "stoneware-mug", quantity: 6 },
     ]);
     expect(result).toMatchObject({ ok: false, error: { code: "invalid_request" } });
   });
 
-  it("uses integer minor units for every amount", () => {
-    expect(Number.isInteger(getProduct("gooseneck-kettle")?.unitPrice)).toBe(true);
+  it("uses integer minor units for every amount", async () => {
+    expect(Number.isInteger((await getProduct("gooseneck-kettle"))?.unitPrice)).toBe(true);
   });
 });

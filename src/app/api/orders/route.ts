@@ -8,7 +8,7 @@ export const POST = withAuditLog(async (request) => {
   const body = await parseJsonBody(request, orderRequestSchema);
   if (!body.ok) return body.response;
 
-  const result = placeOrder(body.data);
+  const result = await placeOrder(body.data);
   if (!result.ok) return errorResponse(result.error);
 
   return Response.json(result.order, { status: 201 });

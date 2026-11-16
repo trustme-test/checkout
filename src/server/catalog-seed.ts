@@ -72,4 +72,25 @@ export const SEED_PRODUCTS: readonly Product[] = [
     unitPrice: 350,
     emoji: "🍻",
   },
+  {
+    id: "birra-tirana-330ml",
+    name: "Birra Tirana, 330 ml",
+    description: "Albanian lager from Tirana, light and crisp.",
+    unitPrice: 320,
+    emoji: "🍺",
+  },
+  {
+    id: "birra-korca-330ml",
+    name: "Birra Korça, 330 ml",
+    description: "Albanian pilsner brewed in Korça since 1928.",
+    unitPrice: 320,
+    emoji: "🍻",
+  },
+  {
+    id: "boza-330ml",
+    name: "Boza, 330 ml",
+    description: "Traditional Albanian fermented millet drink, thick and lightly sweet.",
+    unitPrice: 280,
+    emoji: "🥛",
+  },
 ];

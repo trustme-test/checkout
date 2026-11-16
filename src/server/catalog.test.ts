@@ -10,6 +10,7 @@ describe("catalog", () => {
     "birra-tirana-330ml",
     "birra-korca-330ml",
     "boza-330ml",
+    "cardamom-bun",
   ])("offers %s", async (id) => {
     expect((await getProduct(id))?.unitPrice).toBeGreaterThan(0);
   });

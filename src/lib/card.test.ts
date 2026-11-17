@@ -88,6 +88,14 @@ describe("validateCard", () => {
     expect(Object.keys(result.errors).sort()).toEqual(["cvc", "expiry", "name", "number"]);
   });
 
+  it("rejects a name longer than 100 characters", () => {
+    const result = validateCard(validCardInput({ name: "A".repeat(101) }), NOW);
+    expect(result).toMatchObject({
+      ok: false,
+      errors: { name: "Name must be 100 characters or fewer." },
+    });
+  });
+
   it("rejects a number that fails the checksum", () => {
     const result = validateCard(validCardInput({ number: TEST_CARDS.invalidChecksum }), NOW);
     expect(result).toMatchObject({ ok: false, errors: { number: "Card number is not valid." } });

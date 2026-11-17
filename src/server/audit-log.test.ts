@@ -117,6 +117,21 @@ describe("withAuditLog", () => {
     ]);
   });
 
+  it("logs an error response without a code when its body is not an error envelope", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const gateway = withAuditLog(
+      async () => new Response("<html>Bad gateway</html>", { status: 502 }),
+    );
+
+    const response = await gateway(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(response.status).toBe(502);
+    expect(sentLogs()).toEqual([
+      expect.objectContaining({ status: "error", message: "POST /api/orders 502" }),
+    ]);
+  });
+
   it("logs a 500 and rethrows when the handler throws", async () => {
     vi.stubEnv("DD_API_KEY", "test-api-key");
     const failing = withAuditLog(async () => {

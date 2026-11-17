@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
@@ -94,4 +94,76 @@ describe("CheckoutView", () => {
     expect(screen.getByRole("link", { name: "Browse the shop" })).toHaveAttribute("href", "/");
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it("asks the customer to confirm again when prices change, and re-prices the basket", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    const fetch = stubFetch(async (url) =>
+      url === "/api/orders"
+        ? Response.json(
+            { error: { code: "price_changed", message: "Prices changed." } },
+            { status: 409 },
+          )
+        : undefined,
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Prices changed since you opened");
+    await waitFor(() => {
+      expect(fetch.mock.calls.filter(([url]) => url === "/api/quote")).toHaveLength(2);
+    });
+    expect(await screen.findByTestId("order-total")).toBeInTheDocument();
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
+  it("tells the customer when the server cannot be reached", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    stubFetch(async (url) => {
+      if (url === "/api/orders") throw new TypeError("Failed to fetch");
+      return undefined;
+    });
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("We couldn't reach the server");
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
+  it("lets the customer retry when the total cannot be loaded", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    let quoteCalls = 0;
+    stubFetch(async (url) => {
+      if (url !== "/api/quote") return undefined;
+      quoteCalls += 1;
+      return quoteCalls === 1 ? new Response("Gateway timeout", { status: 504 }) : undefined;
+    });
+    render(<CheckoutView />);
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("We couldn't load your order total.");
+    await user.click(within(alert).getByRole("button", { name: "Try again" }));
+
+    expect(await screen.findByTestId("order-total")).toBeInTheDocument();
+    expect(quoteCalls).toBe(2);
+  });
 });
+
+/** Routes requests to the real handlers unless `override` returns a response for them. */
+function stubFetch(override: (url: string, init?: RequestInit) => Promise<Response | undefined>) {
+  const handlers = createRouteHandlerFetch();
+  const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const overridden = await override(String(input), init);
+    return overridden ?? handlers(input, init);
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}

@@ -103,4 +103,28 @@ describe("createBasketStore", () => {
     store.add("mug");
     expect(store.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
   });
+
+  it("reloads the basket when another tab changes it", () => {
+    const target = Object.assign(new EventTarget(), { localStorage: memoryStorage() });
+    vi.stubGlobal("window", target);
+    try {
+      const storage = memoryStorage();
+      const store = createBasketStore(() => storage);
+      const listener = vi.fn();
+      const unsubscribe = store.subscribe(listener);
+      expect(store.getSnapshot()).toEqual([]);
+
+      storage.setItem(BASKET_STORAGE_KEY, JSON.stringify([{ productId: "mug", quantity: 3 }]));
+      target.dispatchEvent(Object.assign(new Event("storage"), { key: "unrelated-key" }));
+      expect(listener).not.toHaveBeenCalled();
+
+      target.dispatchEvent(Object.assign(new Event("storage"), { key: BASKET_STORAGE_KEY }));
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(store.getSnapshot()).toEqual([{ productId: "mug", quantity: 3 }]);
+
+      unsubscribe();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

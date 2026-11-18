@@ -64,4 +64,25 @@ describe("CardForm", () => {
     });
     expect(await screen.findByText("Security code was rejected.")).toBeInTheDocument();
   });
+
+  it("ignores repeated submits while a payment is in progress", async () => {
+    let finish: () => void = () => {};
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const { user } = renderForm(onSubmit);
+
+    await user.type(screen.getByLabelText("Name on card"), "Alex Andersson");
+    await user.type(screen.getByLabelText("Card number"), TEST_CARDS.visa);
+    await user.type(screen.getByLabelText("Expiry (MM/YY)"), futureExpiry());
+    await user.type(screen.getByLabelText("Security code"), "123");
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+    await user.click(screen.getByRole("button", { name: "Processing…" }));
+    finish();
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
 });

@@ -155,6 +155,55 @@ describe("CheckoutView", () => {
     expect(await screen.findByTestId("order-total")).toBeInTheDocument();
     expect(quoteCalls).toBe(2);
   });
+
+  it("shows the card field errors that the server returns", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    stubFetch(async (url) =>
+      url === "/api/orders"
+        ? Response.json(
+            {
+              error: {
+                code: "invalid_card",
+                message: "Some card details are not valid.",
+                details: { fields: { number: "Card number was rejected." } },
+              },
+            },
+            { status: 422 },
+          )
+        : undefined,
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Check your card details");
+    expect(await screen.findByText("Card number was rejected.")).toBeInTheDocument();
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
+  it("shows the server's message for an unexpected order error", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    stubFetch(async (url) =>
+      url === "/api/orders"
+        ? Response.json(
+            { error: { code: "invalid_request", message: "Order could not be placed." } },
+            { status: 400 },
+          )
+        : undefined,
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Order could not be placed.");
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
 });
 
 /** Routes requests to the real handlers unless `override` returns a response for them. */

@@ -163,4 +163,36 @@ describe("withAuditLog", () => {
       expect.any(TypeError),
     );
   });
+
+  it("logs an error response without a code when its error has no string code", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const odd = withAuditLog(async () =>
+      Response.json({ error: { message: "No code here." } }, { status: 400 }),
+    );
+
+    await odd(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(sentLogs()).toEqual([expect.not.objectContaining({ error: expect.anything() })]);
+  });
+
+  it("logs an error response without a code when its body is not an object", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const scalar = withAuditLog(async () => Response.json("oops", { status: 400 }));
+
+    await scalar(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(sentLogs()).toEqual([expect.not.objectContaining({ error: expect.anything() })]);
+  });
+
+  it("reports a rejected Datadog intake without throwing", async () => {
+    vi.stubEnv("DD_API_KEY", "bad-key");
+    fetchMock.mockResolvedValue(new Response(null, { status: 403 }));
+
+    await created(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(console.error).toHaveBeenCalledWith("Datadog log intake returned HTTP 403.");
+  });
 });

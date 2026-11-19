@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
@@ -104,5 +105,13 @@ describe("BasketSummary", () => {
     await user.click(screen.getByRole("button", { name: `Remove ${mug.name} from basket` }));
 
     expect(screen.getByText("Your basket is empty.")).toBeInTheDocument();
+  });
+
+  it("shows a loading message instead of the basket before it is loaded", () => {
+    basketStore.add("stoneware-mug", 1);
+    const html = renderToString(<BasketSummary products={products} />);
+
+    expect(html).toContain("Loading basket…");
+    expect(html).not.toContain("Stoneware Mug, 300 ml");
   });
 });

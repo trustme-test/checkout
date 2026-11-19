@@ -128,3 +128,22 @@ describe("createBasketStore", () => {
     }
   });
 });
+
+describe("basket store without localStorage", () => {
+  it("keeps the basket in memory when the browser blocks storage", async () => {
+    vi.resetModules();
+    vi.stubGlobal("window", {
+      get localStorage(): never {
+        throw new DOMException("Storage is disabled.", "SecurityError");
+      },
+    });
+    try {
+      const { basketStore } = await import("./basket-store");
+      basketStore.add("stoneware-mug", 2);
+      expect(basketStore.getSnapshot()).toEqual([{ productId: "stoneware-mug", quantity: 2 }]);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
+  });
+});

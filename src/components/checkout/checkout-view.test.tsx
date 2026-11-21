@@ -120,6 +120,54 @@ describe("CheckoutView", () => {
     expect(basketStore.getSnapshot()).toHaveLength(1);
   });
 
+  it("shows the server's card validation message when the card is rejected", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    stubFetch(async (url) =>
+      url === "/api/orders"
+        ? Response.json(
+            {
+              error: {
+                code: "invalid_card",
+                message: "Some card details are not valid.",
+                details: { fields: { cvc: "Security code must be 3 digits." } },
+              },
+            },
+            { status: 422 },
+          )
+        : undefined,
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Check your card details");
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
+  it("shows the server message for an unexpected error", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    stubFetch(async (url) =>
+      url === "/api/orders"
+        ? Response.json(
+            { error: { code: "internal_error", message: "Something went wrong on our side." } },
+            { status: 500 },
+          )
+        : undefined,
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Something went wrong on our side.");
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
   it("tells the customer when the server cannot be reached", async () => {
     const user = userEvent.setup();
     basketStore.add("ceramic-dripper");

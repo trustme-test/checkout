@@ -132,6 +132,27 @@ describe("withAuditLog", () => {
     ]);
   });
 
+  it("logs no error kind when the error envelope has no string code", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const malformed = [
+      "null",
+      JSON.stringify({ error: "declined" }),
+      JSON.stringify({ error: { code: 42 } }),
+    ];
+
+    for (const body of malformed) {
+      const handler = withAuditLog(async () => new Response(body, { status: 400 }));
+      await handler(jsonRequest("/api/orders", {}));
+    }
+    await runAfterCallbacks();
+
+    const logs = sentLogs();
+    expect(logs).toHaveLength(malformed.length);
+    for (const log of logs) {
+      expect(log).not.toHaveProperty("error");
+    }
+  });
+
   it("logs a 500 and rethrows when the handler throws", async () => {
     vi.stubEnv("DD_API_KEY", "test-api-key");
     const failing = withAuditLog(async () => {
@@ -148,6 +169,17 @@ describe("withAuditLog", () => {
         error: { kind: "unhandled_exception" },
       }),
     ]);
+  });
+
+  it("reports a rejected log intake response without throwing", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    fetchMock.mockResolvedValue(new Response("forbidden", { status: 403 }));
+
+    const response = await created(jsonRequest("/api/orders", {}));
+
+    await expect(runAfterCallbacks()).resolves.toBeUndefined();
+    expect(response.status).toBe(201);
+    expect(console.error).toHaveBeenCalledWith("Datadog log intake returned HTTP 403.");
   });
 
   it("does not throw when the Datadog intake fails", async () => {

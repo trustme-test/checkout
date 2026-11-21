@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
@@ -27,6 +28,14 @@ const products = [mug, grinder];
 describe("BasketSummary", () => {
   beforeEach(() => {
     basketStore.clear();
+  });
+
+  it("shows a loading message until the basket has loaded", () => {
+    basketStore.add("stoneware-mug", 1);
+    const html = renderToStaticMarkup(<BasketSummary products={products} />);
+
+    expect(html).toContain("Loading basket…");
+    expect(html).not.toContain("Your basket is empty.");
   });
 
   it("shows an empty message when the basket has no items", () => {

@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { BasketLink } from "./basket-link";
@@ -34,5 +35,14 @@ describe("BasketLink", () => {
 
     const link = screen.getByRole("link", { name: "Basket, 5 items" });
     expect(link).toHaveTextContent("5");
+  });
+
+  it("renders a placeholder count on the server, before the basket can be read", () => {
+    basketStore.add("stoneware-mug", 2);
+    const html = renderToString(<BasketLink />);
+
+    expect(html).toContain('aria-label="Basket"');
+    expect(html).toContain(">–<");
+    expect(html).not.toContain("Basket, 2 items");
   });
 });

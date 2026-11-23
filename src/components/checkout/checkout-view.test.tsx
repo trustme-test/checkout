@@ -1,5 +1,6 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { futureExpiry, TEST_CARDS } from "@/test/fixtures";
@@ -85,6 +86,36 @@ describe("CheckoutView", () => {
     await user.click(within(alert).getByRole("button", { name: "Empty basket" }));
 
     expect(await screen.findByText("Your basket is empty.")).toBeInTheDocument();
+  });
+
+  it("renders a loading state on the server, before the basket is readable", () => {
+    basketStore.add("ceramic-dripper");
+
+    expect(renderToStaticMarkup(<CheckoutView />)).toContain("Loading your basket…");
+  });
+
+  it("ignores a failed quote request that was superseded by a basket change", async () => {
+    let quoteCalls = 0;
+    stubFetch(async (url, init) => {
+      if (url !== "/api/quote") return undefined;
+      quoteCalls += 1;
+      if (quoteCalls > 1) return undefined;
+      // The first request fails only once the component aborts it.
+      return new Promise<Response>((_, reject) => {
+        init?.signal?.addEventListener("abort", () =>
+          reject(new DOMException("Aborted", "AbortError")),
+        );
+      });
+    });
+    basketStore.add("ceramic-dripper");
+    render(<CheckoutView />);
+    await waitFor(() => expect(quoteCalls).toBe(1));
+
+    act(() => basketStore.add("stoneware-mug"));
+
+    expect(await screen.findByTestId("order-total")).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(quoteCalls).toBe(2);
   });
 
   it("points to the shop when the basket is empty", async () => {

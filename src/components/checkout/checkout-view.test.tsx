@@ -120,6 +120,59 @@ describe("CheckoutView", () => {
     expect(basketStore.getSnapshot()).toHaveLength(1);
   });
 
+  it("shows field errors returned by the server for an invalid card", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    const real = fetchMock.getMockImplementation();
+    fetchMock.mockImplementation(async (input, init) =>
+      input === "/api/orders"
+        ? Response.json(
+            {
+              error: {
+                code: "invalid_card",
+                message: "Some card details are not valid.",
+                details: { fields: { number: "Card number was rejected." } },
+              },
+            },
+            { status: 422 },
+          )
+        : real!(input, init),
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByText("Card number was rejected.")).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Check your card details");
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
+  it("shows the server's message for an unexpected error code", async () => {
+    const user = userEvent.setup();
+    basketStore.add("ceramic-dripper");
+    const real = fetchMock.getMockImplementation();
+    fetchMock.mockImplementation(async (input, init) =>
+      input === "/api/orders"
+        ? Response.json(
+            { error: { code: "internal", message: "Something odd happened." } },
+            {
+              status: 500,
+            },
+          )
+        : real!(input, init),
+    );
+    render(<CheckoutView />);
+
+    await screen.findByTestId("order-total");
+    await fillCard(user);
+    await user.click(screen.getByRole("button", { name: /Confirm purchase/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Something odd happened.");
+    expect(basketStore.getSnapshot()).toHaveLength(1);
+  });
+
   it("tells the customer when the server cannot be reached", async () => {
     const user = userEvent.setup();
     basketStore.add("ceramic-dripper");

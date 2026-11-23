@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
@@ -27,6 +28,16 @@ const products = [mug, grinder];
 describe("BasketSummary", () => {
   beforeEach(() => {
     basketStore.clear();
+  });
+
+  it("shows a loading message until the saved basket can be read", () => {
+    basketStore.add(mug.id, 1);
+
+    // Server rendering uses the empty snapshot and ready=false, as before hydration.
+    const markup = renderToStaticMarkup(<BasketSummary products={products} />);
+
+    expect(markup).toContain("Loading basket…");
+    expect(markup).not.toContain(mug.name);
   });
 
   it("shows an empty message when the basket has no items", () => {

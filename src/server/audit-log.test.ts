@@ -189,6 +189,32 @@ describe("withAuditLog", () => {
     expect(sentLogs()[0]).not.toHaveProperty("error");
   });
 
+  it("logs an error response without a code when its JSON body is not an object", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const bare = withAuditLog(async () => Response.json("Something went wrong", { status: 400 }));
+
+    await bare(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(sentLogs()).toEqual([
+      expect.objectContaining({ status: "warn", message: "POST /api/orders 400" }),
+    ]);
+    expect(sentLogs()[0]).not.toHaveProperty("error");
+  });
+
+  it("logs an error response without a code when its JSON body is null", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const empty = withAuditLog(async () => Response.json(null, { status: 500 }));
+
+    await empty(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(sentLogs()).toEqual([
+      expect.objectContaining({ status: "error", message: "POST /api/orders 500" }),
+    ]);
+    expect(sentLogs()[0]).not.toHaveProperty("error");
+  });
+
   it("reports a non-OK response from the Datadog intake without throwing", async () => {
     vi.stubEnv("DD_API_KEY", "test-api-key");
     fetchMock.mockResolvedValue(new Response("forbidden", { status: 403 }));

@@ -3,6 +3,7 @@ import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
 import {
   addItem,
   BASKET_STORAGE_KEY,
+  basketStore,
   countItems,
   createBasketStore,
   quantityOf,
@@ -124,6 +125,24 @@ describe("createBasketStore", () => {
 
       unsubscribe();
     } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe("basketStore when localStorage is denied", () => {
+  it("keeps the basket in memory when reading localStorage throws", () => {
+    vi.stubGlobal("window", {
+      get localStorage(): Storage {
+        throw new DOMException("Access denied", "SecurityError");
+      },
+    });
+    try {
+      basketStore.clear();
+      basketStore.add("ceramic-dripper", 2);
+      expect(basketStore.getSnapshot()).toEqual([{ productId: "ceramic-dripper", quantity: 2 }]);
+    } finally {
+      basketStore.clear();
       vi.unstubAllGlobals();
     }
   });

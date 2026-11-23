@@ -10,6 +10,11 @@ describe("catalog", () => {
     "birra-tirana-330ml",
     "birra-korca-330ml",
     "boza-330ml",
+    "karjala-330ml",
+    "lapin-kulta-330ml",
+    "hartwall-jaffa-330ml",
+    "pommac-330ml",
+    "kotikalja-330ml",
   ])("offers %s", async (id) => {
     expect((await getProduct(id))?.unitPrice).toBeGreaterThan(0);
   });

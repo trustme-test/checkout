@@ -93,4 +93,32 @@ export const SEED_PRODUCTS: readonly Product[] = [
     unitPrice: 280,
     emoji: "🥛",
   },
+  {
+    id: "salted-crisps-150g",
+    name: "Salted Crisps, 150 g",
+    description: "Thin, crunchy potato crisps with a pinch of sea salt.",
+    unitPrice: 190,
+    emoji: "🥔",
+  },
+  {
+    id: "salt-vinegar-crisps-150g",
+    name: "Salt & Vinegar Crisps, 150 g",
+    description: "Sharp, tangy crisps with a bold vinegar kick.",
+    unitPrice: 190,
+    emoji: "🧂",
+  },
+  {
+    id: "paprika-crisps-150g",
+    name: "Paprika Crisps, 150 g",
+    description: "Smoky, sweet paprika crisps that are hard to put down.",
+    unitPrice: 210,
+    emoji: "🌶️",
+  },
+  {
+    id: "cheese-onion-crisps-150g",
+    name: "Cheese & Onion Crisps, 150 g",
+    description: "Savoury cheddar and onion crisps in a big bag.",
+    unitPrice: 210,
+    emoji: "🧅",
+  },
 ];

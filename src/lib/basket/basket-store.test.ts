@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
 import {
   addItem,
@@ -126,5 +126,25 @@ describe("createBasketStore", () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe("basket storage in the browser", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.resetModules();
+  });
+
+  it("keeps the basket in memory when localStorage is blocked", async () => {
+    vi.stubGlobal("window", {
+      get localStorage(): never {
+        throw new DOMException("Access is denied", "SecurityError");
+      },
+    });
+    vi.resetModules();
+    const { basketStore } = await import("./basket-store");
+
+    basketStore.add("mug");
+    expect(basketStore.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
   });
 });

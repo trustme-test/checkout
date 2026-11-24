@@ -132,6 +132,19 @@ describe("withAuditLog", () => {
     ]);
   });
 
+  it("logs an error response without a code when its JSON body is not an object", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const failing = withAuditLog(async () => Response.json("Something broke", { status: 500 }));
+
+    const response = await failing(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(response.status).toBe(500);
+    expect(sentLogs()).toEqual([
+      expect.objectContaining({ status: "error", message: "POST /api/orders 500" }),
+    ]);
+  });
+
   it("logs a 500 and rethrows when the handler throws", async () => {
     vi.stubEnv("DD_API_KEY", "test-api-key");
     const failing = withAuditLog(async () => {

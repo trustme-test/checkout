@@ -1,5 +1,6 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { futureExpiry, TEST_CARDS } from "@/test/fixtures";
@@ -207,6 +208,34 @@ describe("CheckoutView", () => {
 
     expect(await screen.findByTestId("order-total")).toBeInTheDocument();
     expect(quoteCalls).toBe(2);
+  });
+
+  it("shows a loading message until the basket can be read", () => {
+    basketStore.add("stoneware-mug");
+    expect(renderToString(<CheckoutView />)).toContain("Loading your basket…");
+  });
+
+  it("ignores a price request that a basket change has superseded", async () => {
+    basketStore.add("stoneware-mug");
+    let firstQuote = true;
+    stubFetch(
+      (url, init) =>
+        new Promise<Response | undefined>((resolve, reject) => {
+          if (url !== "/api/quote" || !firstQuote) return resolve(undefined);
+          // Hold the first price request until the basket change aborts it.
+          firstQuote = false;
+          init?.signal?.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError")),
+          );
+        }),
+    );
+    render(<CheckoutView />);
+    act(() => {
+      basketStore.add("paper-filters-100");
+    });
+
+    expect(await screen.findByTestId("order-total")).toHaveTextContent("€25.00");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });
 

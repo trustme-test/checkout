@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
@@ -104,5 +105,11 @@ describe("BasketSummary", () => {
     await user.click(screen.getByRole("button", { name: `Remove ${mug.name} from basket` }));
 
     expect(screen.getByText("Your basket is empty.")).toBeInTheDocument();
+  });
+
+  it("shows a loading message until the basket can be read", () => {
+    basketStore.add("stoneware-mug");
+    // Server rendering has no localStorage, so the basket is not ready yet.
+    expect(renderToString(<BasketSummary products={products} />)).toContain("Loading basket…");
   });
 });

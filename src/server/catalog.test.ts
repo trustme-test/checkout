@@ -10,6 +10,10 @@ describe("catalog", () => {
     "birra-tirana-330ml",
     "birra-korca-330ml",
     "boza-330ml",
+    "salted-crisps-150g",
+    "salt-vinegar-crisps-150g",
+    "paprika-crisps-150g",
+    "cheese-onion-crisps-150g",
   ])("offers %s", async (id) => {
     expect((await getProduct(id))?.unitPrice).toBeGreaterThan(0);
   });

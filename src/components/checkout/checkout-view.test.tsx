@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { futureExpiry, TEST_CARDS } from "@/test/fixtures";
@@ -24,6 +25,15 @@ describe("CheckoutView", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("shows a loading message until the saved basket can be read", () => {
+    basketStore.add("ceramic-dripper");
+
+    const html = renderToString(<CheckoutView />);
+
+    expect(html).toContain("Loading your basket…");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("shows the confirmed total and completes the purchase", async () => {

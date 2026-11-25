@@ -132,6 +132,19 @@ describe("withAuditLog", () => {
     ]);
   });
 
+  it("logs an error response without a code when its JSON body is null", async () => {
+    vi.stubEnv("DD_API_KEY", "test-api-key");
+    const unavailable = withAuditLog(async () => Response.json(null, { status: 503 }));
+
+    const response = await unavailable(jsonRequest("/api/orders", {}));
+    await runAfterCallbacks();
+
+    expect(response.status).toBe(503);
+    expect(sentLogs()).toEqual([
+      expect.objectContaining({ status: "error", message: "POST /api/orders 503" }),
+    ]);
+  });
+
   it("logs a 500 and rethrows when the handler throws", async () => {
     vi.stubEnv("DD_API_KEY", "test-api-key");
     const failing = withAuditLog(async () => {

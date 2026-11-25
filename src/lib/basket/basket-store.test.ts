@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
 import {
   addItem,
@@ -37,6 +37,19 @@ describe("basket operations", () => {
     const items = addItem(addItem([], "mug"), "kettle");
     expect(setItemQuantity(items, "mug", 0)).toEqual([{ productId: "kettle", quantity: 1 }]);
     expect(removeItem(items, "kettle")).toEqual([{ productId: "mug", quantity: 1 }]);
+  });
+
+  it("leaves other lines untouched when one quantity changes", () => {
+    const items = addItem(addItem([], "mug", 2), "kettle", 1);
+    expect(setItemQuantity(items, "kettle", 4)).toEqual([
+      { productId: "mug", quantity: 2 },
+      { productId: "kettle", quantity: 4 },
+    ]);
+  });
+
+  it("does not add a new product with a zero quantity", () => {
+    const items = addItem([], "mug");
+    expect(addItem(items, "kettle", 0)).toBe(items);
   });
 
   it("counts every unit in the basket", () => {
@@ -126,5 +139,35 @@ describe("createBasketStore", () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe("the app-wide basket store", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.resetModules();
+  });
+
+  it("works on the server, where there is no window", async () => {
+    vi.resetModules();
+    const { basketStore } = await import("./basket-store");
+
+    basketStore.add("mug");
+
+    expect(basketStore.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
+  });
+
+  it("works when the browser blocks access to localStorage", async () => {
+    vi.stubGlobal("window", {
+      get localStorage(): Storage {
+        throw new DOMException("Blocked", "SecurityError");
+      },
+    });
+    vi.resetModules();
+    const { basketStore } = await import("./basket-store");
+
+    basketStore.add("mug", 2);
+
+    expect(basketStore.getSnapshot()).toEqual([{ productId: "mug", quantity: 2 }]);
   });
 });

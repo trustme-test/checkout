@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 import { basketStore } from "@/lib/basket/basket-store";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/schemas";
@@ -27,6 +28,16 @@ const products = [mug, grinder];
 describe("BasketSummary", () => {
   beforeEach(() => {
     basketStore.clear();
+  });
+
+  it("shows a loading message until the saved basket can be read", () => {
+    basketStore.add("stoneware-mug");
+
+    // Server rendering has no access to localStorage, so the basket is not ready yet.
+    const html = renderToString(<BasketSummary products={products} />);
+
+    expect(html).toContain("Loading basket…");
+    expect(html).not.toContain("Your basket is empty.");
   });
 
   it("shows an empty message when the basket has no items", () => {

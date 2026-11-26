@@ -104,6 +104,26 @@ describe("createBasketStore", () => {
     expect(store.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
   });
 
+  it("works when the browser blocks access to localStorage", async () => {
+    const target = {};
+    Object.defineProperty(target, "localStorage", {
+      get() {
+        throw new DOMException("The operation is insecure.", "SecurityError");
+      },
+    });
+    vi.stubGlobal("window", target);
+    try {
+      vi.resetModules();
+      const { basketStore } = await import("./basket-store");
+      expect(basketStore.getSnapshot()).toEqual([]);
+      basketStore.add("mug");
+      expect(basketStore.getSnapshot()).toEqual([{ productId: "mug", quantity: 1 }]);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
+  });
+
   it("reloads the basket when another tab changes it", () => {
     const target = Object.assign(new EventTarget(), { localStorage: memoryStorage() });
     vi.stubGlobal("window", target);

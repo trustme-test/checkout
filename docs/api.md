@@ -62,7 +62,7 @@ curl https://<host>/api/products
       "id": "house-blend-500g",
       "name": "House Blend Beans, 500 g",
       "description": "Our everyday medium roast. Cocoa, hazelnut and dried cherry.",
-      "unitPrice": 1490,
+      "unitPrice": 1863,
       "emoji": "🫘"
     }
   ]
@@ -96,20 +96,20 @@ Response `200`:
     {
       "productId": "stoneware-mug",
       "name": "Stoneware Mug, 300 ml",
-      "unitPrice": 1850,
+      "unitPrice": 2313,
       "quantity": 2,
-      "lineTotal": 3700
+      "lineTotal": 4626
     },
     {
       "productId": "paper-filters-100",
       "name": "Paper Filters, 100 pack",
-      "unitPrice": 650,
+      "unitPrice": 813,
       "quantity": 1,
-      "lineTotal": 650
+      "lineTotal": 813
     }
   ],
   "itemCount": 3,
-  "total": 4350
+  "total": 5439
 }
 ```
 
@@ -137,7 +137,7 @@ curl -X POST https://<host>/api/orders \
   -d '{
     "items": [{"productId":"stoneware-mug","quantity":2}],
     "card": {"name":"Alex Andersson","number":"4242424242424242","expiry":"12/30","cvc":"123"},
-    "expectedTotal": 3700
+    "expectedTotal": 4626
   }'
 ```
 
@@ -153,13 +153,13 @@ Response `201`:
     {
       "productId": "stoneware-mug",
       "name": "Stoneware Mug, 300 ml",
-      "unitPrice": 1850,
+      "unitPrice": 2313,
       "quantity": 2,
-      "lineTotal": 3700
+      "lineTotal": 4626
     }
   ],
   "itemCount": 2,
-  "total": 3700,
+  "total": 4626,
   "payment": { "brand": "visa", "last4": "4242" }
 }
 ```

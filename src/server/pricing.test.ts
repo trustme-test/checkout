@@ -14,21 +14,21 @@ describe("createQuote", () => {
       quote: {
         currency: "EUR",
         itemCount: 3,
-        total: 1490 * 2 + 650,
+        total: 1863 * 2 + 813,
         lines: [
           {
             productId: "house-blend-500g",
             name: "House Blend Beans, 500 g",
-            unitPrice: 1490,
+            unitPrice: 1863,
             quantity: 2,
-            lineTotal: 2980,
+            lineTotal: 3726,
           },
           {
             productId: "paper-filters-100",
             name: "Paper Filters, 100 pack",
-            unitPrice: 650,
+            unitPrice: 813,
             quantity: 1,
-            lineTotal: 650,
+            lineTotal: 813,
           },
         ],
       },

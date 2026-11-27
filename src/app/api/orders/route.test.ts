@@ -12,7 +12,7 @@ vi.mock("next/server", () => ({
 }));
 
 const items = [{ productId: "stoneware-mug", quantity: 2 }];
-const total = 3700;
+const total = 4626;
 
 describe("POST /api/orders", () => {
   it("creates an order and returns 201 with the confirmation", async () => {

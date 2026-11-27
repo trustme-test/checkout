@@ -9,7 +9,7 @@ describe("POST /api/quote", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ currency: "EUR", itemCount: 2, total: 11800 });
+    expect(await response.json()).toMatchObject({ currency: "EUR", itemCount: 2, total: 14750 });
   });
 
   it("rejects a body that is not JSON", async () => {

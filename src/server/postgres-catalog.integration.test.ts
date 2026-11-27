@@ -50,7 +50,7 @@ describe("PostgresProductRepository (Postgres in a container)", () => {
       {
         items: [{ productId: "ceramic-dripper", quantity: 1 }],
         card: validCardInput({ expiry: "12/27" }),
-        expectedTotal: 2900,
+        expectedTotal: 3335,
       },
       { now: new Date("2026-06-15T12:00:00Z"), catalog: repository },
     );

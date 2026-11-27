@@ -11,7 +11,7 @@ export function BasketLink() {
     <Link
       href="/checkout"
       aria-label={label}
-      className="inline-flex items-center gap-2 rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-800 hover:bg-stone-100"
+      className="inline-flex items-center gap-2 rounded-lg border border-stone-300 dark:border-stone-600 px-3 py-1.5 text-sm font-medium text-stone-800 dark:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-700"
     >
       <span aria-hidden="true">🛒</span>
       <span>Basket</span>

@@ -107,7 +107,10 @@ export function CardForm({ amountLabel, onSubmit, formError }: CardFormProps) {
           const wide = field.name === "name" || field.name === "number";
           return (
             <div key={field.name} className={wide ? "col-span-2" : "col-span-1"}>
-              <label htmlFor={inputId} className="block text-sm font-medium text-stone-700">
+              <label
+                htmlFor={inputId}
+                className="block text-sm font-medium text-stone-700 dark:text-stone-300"
+              >
                 {field.label}
               </label>
               <input
@@ -121,14 +124,14 @@ export function CardForm({ amountLabel, onSubmit, formError }: CardFormProps) {
                 onChange={(event) => handleChange(field.name, event.target.value)}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? errorId : undefined}
-                className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-xs placeholder:text-stone-400 focus:ring-2 focus:outline-none ${
+                className={`mt-1 block w-full rounded-lg border bg-white dark:bg-stone-800 px-3 py-2 text-sm shadow-xs placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:ring-2 focus:outline-none ${
                   error
-                    ? "border-red-500 focus:ring-red-200"
-                    : "border-stone-300 focus:border-amber-700 focus:ring-amber-200"
+                    ? "border-red-500 focus:ring-red-200 dark:focus:ring-red-900"
+                    : "border-stone-300 dark:border-stone-600 focus:border-amber-700 focus:ring-amber-200 dark:focus:ring-amber-900"
                 }`}
               />
               {error && (
-                <p id={errorId} className="mt-1 text-xs text-red-700">
+                <p id={errorId} className="mt-1 text-xs text-red-700 dark:text-red-400">
                   {error}
                 </p>
               )}
@@ -138,7 +141,10 @@ export function CardForm({ amountLabel, onSubmit, formError }: CardFormProps) {
       </div>
 
       {formError && (
-        <p role="alert" className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p
+          role="alert"
+          className="mt-4 rounded-lg bg-red-50 dark:bg-red-950 px-3 py-2 text-sm text-red-800 dark:text-red-200"
+        >
           {formError}
         </p>
       )}
@@ -150,7 +156,7 @@ export function CardForm({ amountLabel, onSubmit, formError }: CardFormProps) {
       >
         {submitting ? "Processing…" : `Confirm purchase · ${amountLabel}`}
       </button>
-      <p className="mt-2 text-center text-xs text-stone-500">
+      <p className="mt-2 text-center text-xs text-stone-500 dark:text-stone-400">
         Test mode: your card will not be charged.
       </p>
     </form>

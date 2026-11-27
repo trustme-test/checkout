@@ -5,9 +5,10 @@ const buttonBase =
 
 export const primaryButton = `${buttonBase} bg-amber-800 text-white hover:bg-amber-900 focus-visible:outline-amber-800`;
 
-export const secondaryButton = `${buttonBase} border border-stone-300 bg-white text-stone-800 hover:bg-stone-100 focus-visible:outline-stone-500`;
+export const secondaryButton = `${buttonBase} border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-700 focus-visible:outline-stone-500`;
 
 export const iconButton =
-  "inline-flex size-8 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-stone-500 disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex size-8 items-center justify-center rounded-md border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 focus-visible:outline-2 focus-visible:outline-stone-500 disabled:cursor-not-allowed disabled:opacity-40";
 
-export const card = "rounded-xl border border-stone-200 bg-white shadow-sm";
+export const card =
+  "rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 shadow-sm";

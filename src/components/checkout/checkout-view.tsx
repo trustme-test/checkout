@@ -96,21 +96,21 @@ export function CheckoutView() {
       <h1 className="text-2xl font-bold tracking-tight">Checkout</h1>
 
       {!ready ? (
-        <p className="mt-6 text-stone-500">Loading your basket…</p>
+        <p className="mt-6 text-stone-500 dark:text-stone-400">Loading your basket…</p>
       ) : items.length === 0 ? (
         <div className={`${card} mt-6 p-6 text-center`}>
-          <p className="text-stone-600">Your basket is empty.</p>
+          <p className="text-stone-600 dark:text-stone-400">Your basket is empty.</p>
           <Link href="/" className={`${primaryButton} mt-4`}>
             Browse the shop
           </Link>
         </div>
       ) : !current ? (
-        <p className="mt-6 text-stone-500" role="status">
+        <p className="mt-6 text-stone-500 dark:text-stone-400" role="status">
           Calculating your total…
         </p>
       ) : current.status === "error" ? (
         <div className={`${card} mt-6 p-6`} role="alert">
-          <p className="text-stone-700">{current.message}</p>
+          <p className="text-stone-700 dark:text-stone-300">{current.message}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
@@ -130,7 +130,7 @@ export function CheckoutView() {
             <OrderSummary quote={current.quote} />
             <Link
               href="/"
-              className="mt-4 inline-block text-sm font-medium text-amber-800 hover:underline"
+              className="mt-4 inline-block text-sm font-medium text-amber-800 dark:text-amber-400 hover:underline"
             >
               ← Edit basket
             </Link>

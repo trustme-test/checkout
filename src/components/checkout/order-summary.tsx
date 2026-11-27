@@ -7,12 +7,12 @@ export function OrderSummary({ quote }: { quote: Pick<Quote, "lines" | "total" |
       <h2 id="order-summary-heading" className="text-lg font-semibold">
         Order summary
       </h2>
-      <ul className="mt-3 divide-y divide-stone-100">
+      <ul className="mt-3 divide-y divide-stone-100 dark:divide-stone-800">
         {quote.lines.map((line) => (
           <li key={line.productId} className="flex items-start justify-between gap-4 py-2 text-sm">
             <span>
               <span className="font-medium">{line.name}</span>
-              <span className="block text-stone-500">
+              <span className="block text-stone-500 dark:text-stone-400">
                 {line.quantity} × {formatMoney(line.unitPrice, quote.currency)}
               </span>
             </span>
@@ -20,9 +20,9 @@ export function OrderSummary({ quote }: { quote: Pick<Quote, "lines" | "total" |
           </li>
         ))}
       </ul>
-      <dl className="mt-2 space-y-1 border-t border-stone-200 pt-3 text-sm">
+      <dl className="mt-2 space-y-1 border-t border-stone-200 dark:border-stone-700 pt-3 text-sm">
         <div className="flex justify-between">
-          <dt className="text-stone-600">Delivery</dt>
+          <dt className="text-stone-600 dark:text-stone-400">Delivery</dt>
           <dd>Free</dd>
         </div>
         <div className="flex justify-between text-base font-semibold">

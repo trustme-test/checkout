@@ -9,7 +9,7 @@ const card = validCardInput({ expiry: "12/27" });
 
 describe("placeOrder", () => {
   it("confirms the order and only exposes the last four card digits", async () => {
-    const result = await placeOrder({ items, card, expectedTotal: 2900 }, options);
+    const result = await placeOrder({ items, card, expectedTotal: 3335 }, options);
 
     expect(result).toEqual({
       ok: true,
@@ -19,8 +19,8 @@ describe("placeOrder", () => {
         createdAt: "2026-06-15T12:00:00.000Z",
         currency: "EUR",
         itemCount: 1,
-        total: 2900,
-        lines: [expect.objectContaining({ productId: "ceramic-dripper", lineTotal: 2900 })],
+        total: 3335,
+        lines: [expect.objectContaining({ productId: "ceramic-dripper", lineTotal: 3335 })],
         payment: { brand: "visa", last4: "4242" },
       },
     });
@@ -30,7 +30,7 @@ describe("placeOrder", () => {
 
   it("returns field errors for invalid card details", async () => {
     const result = await placeOrder(
-      { items, card: { ...card, number: TEST_CARDS.invalidChecksum }, expectedTotal: 2900 },
+      { items, card: { ...card, number: TEST_CARDS.invalidChecksum }, expectedTotal: 3335 },
       options,
     );
     expect(result).toEqual({
@@ -47,7 +47,7 @@ describe("placeOrder", () => {
     const result = await placeOrder({ items, card, expectedTotal: 100 }, options);
     expect(result).toMatchObject({
       ok: false,
-      error: { code: "price_changed", details: { quote: { total: 2900 } } },
+      error: { code: "price_changed", details: { quote: { total: 3335 } } },
     });
   });
 
@@ -61,7 +61,7 @@ describe("placeOrder", () => {
 
   it("declines the declined test card", async () => {
     const result = await placeOrder(
-      { items, card: { ...card, number: TEST_CARDS.declined }, expectedTotal: 2900 },
+      { items, card: { ...card, number: TEST_CARDS.declined }, expectedTotal: 3335 },
       options,
     );
     expect(result).toMatchObject({ ok: false, error: { code: "card_declined" } });

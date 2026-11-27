@@ -33,9 +33,9 @@ describe("CheckoutView", () => {
 
     render(<CheckoutView />);
 
-    expect(await screen.findByTestId("order-total")).toHaveTextContent("€43.50");
+    expect(await screen.findByTestId("order-total")).toHaveTextContent("€50.04");
     await fillCard(user);
-    await user.click(screen.getByRole("button", { name: "Confirm purchase · €43.50" }));
+    await user.click(screen.getByRole("button", { name: "Confirm purchase · €50.04" }));
 
     expect(await screen.findByRole("heading", { name: "Purchase done!" })).toBeInTheDocument();
     expect(screen.getByText(/Visa ending in 4242/)).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe("CheckoutView", () => {
         { productId: "stoneware-mug", quantity: 2 },
         { productId: "paper-filters-100", quantity: 1 },
       ],
-      expectedTotal: 4350,
+      expectedTotal: 5004,
     });
   });
 

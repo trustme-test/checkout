@@ -62,7 +62,7 @@ curl https://<host>/api/products
       "id": "house-blend-500g",
       "name": "House Blend Beans, 500 g",
       "description": "Our everyday medium roast. Cocoa, hazelnut and dried cherry.",
-      "unitPrice": 1490,
+      "unitPrice": 1714,
       "emoji": "🫘"
     }
   ]
@@ -96,20 +96,20 @@ Response `200`:
     {
       "productId": "stoneware-mug",
       "name": "Stoneware Mug, 300 ml",
-      "unitPrice": 1850,
+      "unitPrice": 2128,
       "quantity": 2,
-      "lineTotal": 3700
+      "lineTotal": 4256
     },
     {
       "productId": "paper-filters-100",
       "name": "Paper Filters, 100 pack",
-      "unitPrice": 650,
+      "unitPrice": 748,
       "quantity": 1,
-      "lineTotal": 650
+      "lineTotal": 748
     }
   ],
   "itemCount": 3,
-  "total": 4350
+  "total": 5004
 }
 ```
 
@@ -153,13 +153,13 @@ Response `201`:
     {
       "productId": "stoneware-mug",
       "name": "Stoneware Mug, 300 ml",
-      "unitPrice": 1850,
+      "unitPrice": 2128,
       "quantity": 2,
-      "lineTotal": 3700
+      "lineTotal": 4256
     }
   ],
   "itemCount": 2,
-  "total": 3700,
+  "total": 4256,
   "payment": { "brand": "visa", "last4": "4242" }
 }
 ```

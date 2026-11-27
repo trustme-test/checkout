@@ -11,7 +11,9 @@ export default async function ShopPage() {
         <h1 id="shop-heading" className="text-2xl font-bold tracking-tight">
           Shop
         </h1>
-        <p className="mt-1 text-stone-600">Freshly roasted coffee and the gear to brew it well.</p>
+        <p className="mt-1 text-stone-600 dark:text-stone-400">
+          Freshly roasted coffee and the gear to brew it well.
+        </p>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => (
             <li key={product.id}>

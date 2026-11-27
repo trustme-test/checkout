@@ -20,8 +20,8 @@ export function ProductCard({ product }: { product: Product }) {
         {product.emoji}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h2 className="font-semibold text-stone-900">{product.name}</h2>
-        <p className="flex-1 text-sm text-stone-600">{product.description}</p>
+        <h2 className="font-semibold text-stone-900 dark:text-stone-50">{product.name}</h2>
+        <p className="flex-1 text-sm text-stone-600 dark:text-stone-400">{product.description}</p>
         <div className="mt-2 flex items-center justify-between gap-3">
           <span className="text-base font-semibold">{formatMoney(product.unitPrice)}</span>
           <button
@@ -35,7 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
           </button>
         </div>
         {/* Always rendered so cards in a row keep the same height. */}
-        <p className="h-4 text-xs text-stone-500" aria-live="polite">
+        <p className="h-4 text-xs text-stone-500 dark:text-stone-400" aria-live="polite">
           {inBasket > 0 ? `${inBasket} in basket` : ""}
         </p>
       </div>

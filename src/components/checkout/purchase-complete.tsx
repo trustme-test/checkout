@@ -19,12 +19,12 @@ export function PurchaseComplete({ order }: { order: OrderConfirmation }) {
           ✅
         </p>
         <h1 className="mt-3 text-2xl font-bold tracking-tight">Purchase done!</h1>
-        <p className="mt-2 text-stone-600">
+        <p className="mt-2 text-stone-600 dark:text-stone-400">
           Thank you for your order. Your payment of{" "}
           <strong>{formatMoney(order.total, order.currency)}</strong> with{" "}
           {BRAND_LABELS[order.payment.brand]} ending in {order.payment.last4} was approved.
         </p>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
           Order number <span className="font-mono">{order.orderId}</span>
         </p>
       </div>

@@ -7,9 +7,9 @@
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 body {
-  @apply bg-stone-50 font-sans text-stone-900 antialiased;
+  @apply bg-stone-50 font-sans text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-50;
 }

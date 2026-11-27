@@ -28,12 +28,12 @@ export function BasketSummary({ products }: { products: readonly Product[] }) {
       </h2>
 
       {!ready ? (
-        <p className="mt-3 text-sm text-stone-500">Loading basket…</p>
+        <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">Loading basket…</p>
       ) : lines.length === 0 ? (
-        <p className="mt-3 text-sm text-stone-500">Your basket is empty.</p>
+        <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">Your basket is empty.</p>
       ) : (
         <>
-          <ul className="mt-3 divide-y divide-stone-100">
+          <ul className="mt-3 divide-y divide-stone-100 dark:divide-stone-800">
             {lines.map(({ product, quantity }) => (
               <li key={product.id} className="flex flex-col gap-2 py-3">
                 <div className="flex items-start justify-between gap-2 text-sm">
@@ -66,7 +66,7 @@ export function BasketSummary({ products }: { products: readonly Product[] }) {
                   </button>
                   <button
                     type="button"
-                    className="ml-auto text-xs font-medium text-stone-500 underline-offset-2 hover:text-stone-800 hover:underline"
+                    className="ml-auto text-xs font-medium text-stone-500 dark:text-stone-400 underline-offset-2 hover:text-stone-800 dark:hover:text-stone-100 hover:underline"
                     onClick={() => remove(product.id)}
                     aria-label={`Remove ${product.name} from basket`}
                   >
@@ -76,7 +76,7 @@ export function BasketSummary({ products }: { products: readonly Product[] }) {
               </li>
             ))}
           </ul>
-          <div className="mt-2 flex items-center justify-between border-t border-stone-200 pt-3 font-semibold">
+          <div className="mt-2 flex items-center justify-between border-t border-stone-200 dark:border-stone-700 pt-3 font-semibold">
             <span>Subtotal</span>
             <span>{formatMoney(subtotal)}</span>
           </div>

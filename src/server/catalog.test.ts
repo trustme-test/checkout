@@ -10,6 +10,11 @@ describe("catalog", () => {
     "birra-tirana-330ml",
     "birra-korca-330ml",
     "boza-330ml",
+    "ringnes-pils-330ml",
+    "mack-arctic-beer-330ml",
+    "tine-sjokomelk-250ml",
+    "solo-orange-330ml",
+    "farris-mineral-water-330ml",
   ])("offers %s", async (id) => {
     expect((await getProduct(id))?.unitPrice).toBeGreaterThan(0);
   });
